@@ -3,8 +3,8 @@ This is the backend for an e-commerce application built with Node.js, Express, a
 
 Usage
 Start the sever: npm start
-API Endpoints
 
+API Endpoints
 - User Routes
 POST /api/v1/register - Register a new user
 POST /api/v1/login - Login a user
