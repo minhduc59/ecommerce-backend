@@ -4,6 +4,8 @@ const ProductRoute = require("./Routes/Product.Route");
 const UserRoute = require("./Routes/User.Route");
 const OrderRoute = require("./Routes/Order.Route");
 const PaymentRoute = require("./Routes/Payment.Route");
+const CartRoute = require("./Routes/Cart.Route");
+
 const colors = require("colors");
 const path = require("path");
 const cors = require("cors");
@@ -32,16 +34,17 @@ cloudinary.config({
 });
 
 app.use("/api/v1", ProductRoute);
-app.use("/api/v1", UserRoute);  
+app.use("/api/v1", UserRoute);
 app.use("/api/v1", OrderRoute);
 app.use("/api/v1", PaymentRoute);
+app.use("/api/v1", CartRoute);
 
 app.use(ErrorMiddleware);
 
-app.use(express.static(path.join(__dirname, "../frontend/build")))
-app.get("*" , (req,res) =>{
+app.use(express.static(path.join(__dirname, "../frontend/build")));
+app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
-})
+});
 const server = app.listen(process.env.PORT, () => {
   console.log(`Server is Listing on Port 4000`.yellow);
 });
