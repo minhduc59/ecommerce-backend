@@ -5,15 +5,23 @@ const catchAsyncError = require("../Middleware/catch.Async.error");
 const sendToken = require("../Utils/Send.Token");
 const SendEmail = require("../Utils/Send.Email.js");
 const cloudinary = require("cloudinary");
+
 // Creating User
 const registerUser = catchAsyncError(async (req, res, next) => {
-  const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+  const { name, email, password, avatar } = req.body;
+
+  // Kiểm tra xem avatar có phải là một chuỗi không
+  if (typeof avatar !== "string") {
+    return next(new ErrorHandler("Invalid avatar format", 400));
+  }
+
+  const myCloud = await cloudinary.v2.uploader.upload(avatar, {
     folder: "avatars",
     width: 550,
     crop: "scale",
   });
-  const { name, email, password } = req.body;
-  const User = await UserModel.create({
+
+  const user = await UserModel.create({
     name,
     email,
     password,
@@ -22,7 +30,8 @@ const registerUser = catchAsyncError(async (req, res, next) => {
       url: myCloud.secure_url,
     },
   });
-  sendToken(User, 201, res);
+
+  sendToken(user, 201, res);
 });
 // Login User
 const loginUser = catchAsyncError(async (req, res, next) => {
@@ -112,16 +121,30 @@ const getUserDeteails = catchAsyncError(async (req, res, next) => {
 });
 const updatePassword = catchAsyncError(async (req, res, next) => {
   const user = await UserModel.findById(req.user.id).select("+password");
-  const isPasswordMatch = await user.comparePassword(req.body.oldPassword);
-  if (!isPasswordMatch) {
-    return next(new ErrorHandler("Old Password is Incorrect", 401));
+
+  const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
+
+  if (!isPasswordMatched) {
+    return res.status(400).json({
+      success: false,
+      message: "Old password is incorrect",
+    });
   }
+
   if (req.body.newPassword !== req.body.confirmPassword) {
-    return next(new ErrorHandler("Password Doesn't Match", 400));
+    return res.status(400).json({
+      success: false,
+      message: "Password doesn't match",
+    });
   }
+
   user.password = req.body.newPassword;
   await user.save();
-  sendToken(user, 200, res);
+
+  res.status(200).json({
+    success: true,
+    message: "Password updated successfully",
+  });
 });
 const updateUser = catchAsyncError(async (req, res, next) => {
   const newUserData = {

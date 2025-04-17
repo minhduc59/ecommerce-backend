@@ -48,9 +48,3 @@ npm start
 - **POST** `/api/v1/payment/process` - Process payment  
 - **GET** `/api/v1/stripeapikey` - Get Stripe API key  
 
-### **Cart Routes**
-
-- **GET**  `/api/v1/cart` - Get the current user's cart
-- **POST** `/api/v1/cart` - Add an item to the cart
-- **PUT** /api/v1/cart - Update the quantity of an item in the cart
-- **DELETE** /api/v1/cart - Remove an item from the cart
